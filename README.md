@@ -6,9 +6,7 @@ That's pretty much it! Have fun.
 
 ## Usage
 
-You must provide your own OPENAI api key, which you can paste into the chat box when you first open the extension. You API Key is only stored locally. 
-
-
+You must provide your own OpenAI API key, which you can paste into the chat box when you first open the extension. You API Key is only stored locally. 
 
 ## License
 
