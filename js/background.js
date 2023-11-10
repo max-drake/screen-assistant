@@ -1,9 +1,11 @@
 var OPENAI_API_KEY = ''; // Global variable to store the API key
 
+var systemMessage = "You are a creative assistant that is attached to a user's web browser. Your job is to casually chat with them and help develop their ideas. You can use the attached function to grab a screenshot of the user's browser and ask a question about it. Your answers should always be concise, to the point, and insightful."
+
 var messages = []; // Global variable to store the chat messages
 chrome.storage.sync.get('messages', function(result) {
     console.log(result);
-    messages = result['messages'] || [];
+    messages = result['messages'] || [{"role": "system", "content":systemMessage}];
 });// Global variable to store the chat messages
 
 
@@ -62,8 +64,8 @@ chrome.runtime.onMessage.addListener(async function(message, sender, sendRespons
     } 
 
     else if (message.type === "RESET_MESSAGES") {
-        chrome.storage.sync.set({"messages": []});
-        messages = [];
+        messages = [{"role": "system", "content": systemMessage}];
+        chrome.storage.sync.set({"messages": messages});
     }
 
     return true; // Keep the message channel open for asynchronous response
