@@ -1,6 +1,6 @@
 # Screen Assistant
 
-Screen assistant is an chatbot assitant that follows you around the web. It can read what you're looking at and provide insights and answer questions about whatever's on your screen.
+Screen Assistant is a chrome extension chatbot that follows you around the web. It can read what you're looking at and provide insights and answer questions about whatever's on your screen.
 
 That's pretty much it! Have fun.
 
