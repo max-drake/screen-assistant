@@ -41,7 +41,7 @@ h2 {
   flex-grow: 1;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 8px;
   overflow-y: auto;
   scrollbar-width: none;
 }
@@ -54,7 +54,7 @@ h2 {
 
 #chat_input {
   flex-grow: 1;
-  border: 1px solid #637EF7;
+  border: 1px solid;
   border-radius: 6px;
   padding: 4px;
   font-family: 'Poppins', sans-serif;
@@ -110,9 +110,15 @@ h2 {
   animation: fadeIn 0.5s ease-in;
 }
  
+/* @keyframes grow {
+  0% { width: auto; }
+  100% { width: 80%; }
+} */
+
 .chat_box.function_call {
-  background: #FFA500;
-  color: white;
+  background: #42f59b;
+  color: rgb(41, 37, 2);
   align-self: flex-start;
   animation: fadeIn 0.5s ease-in;
+  max-width: 80%;
 }

@@ -89,57 +89,77 @@ $(function() {
         }
     });
 
-    function switch_mode(mode){
+    function switch_mode(mode) {
         c_print(`switching to ${mode} mode`);
-        if (mode == 'waiting_for_api_key') {
-            $('#chat_input').attr('placeholder', 'Please paste your OpenAI API key here');
-            chatInput[0].focus();
-            $('#chat_button').off('click').click(function() {
-                var message = $('#chat_input').val();
-                if (message == '') {
-                    return;
-                }
-                $('#chat_input').val('');
-                switch_mode('checking_api_key');
-                chrome.runtime.sendMessage({type: "API_KEY", key: message}, function(response) {
-                    if (response.status == 'is_valid') {
-                        chrome.storage.sync.set({'API_KEY': message});
-                        switch_mode('chat');
-                    } else if (response.status == 'not_valid'){
-                        chrome.runtime.sendMessage({type: "PRINT", message: "api key invalid"});
-                        switch_mode('api_key_invalid');
-                    }
+    
+        const chatInput = $('#chat_input');
+        const chatButton = $('#chat_button');
+        const newChatButton = $('#new_chat_button');
+    
+        // Reset event handlers
+        chatButton.off('click');
+        newChatButton.off('click');
+    
+        switch (mode) {
+            case 'waiting_for_api_key':
+                chatInput.attr('placeholder', 'Please paste your OpenAI API key here').prop('disabled', false).focus();
+                chatButton.click(handleApiKeyInput);
+                break;
+            case 'checking_api_key':
+                chatInput.attr('placeholder', 'Checking API key').prop('disabled', true).blur();
+                chatInput.css('border', '1px solid grey');
+                break;
+            case 'api_key_invalid':
+                chatInput.attr('placeholder', 'Invalid API key, please try again').prop('disabled', false).focus();
+                chatButton.click(handleApiKeyInput);
+                chatInput.css('border', '1px solid #DE3830');
+                break;
+            case 'chat':
+                chatInput.attr('placeholder', 'Write your message').prop('disabled', false).focus();
+                newChatButton.click(resetMessages);
+                chatButton.click(handleChatMessage);
+                chatInput.on('input', function() {
+                    $(this).css('border', '1px solid #637EF7');
                 });
-            });
-        } else if (mode == 'checking_api_key') {
-            $('#chat_input').attr('placeholder', 'Checking API key');
-            chatInput[0].focus();
-        } else if (mode == 'api_key_invalid') {
-            $('#chat_input').attr('placeholder', 'Invalid API key, please try again');
-            chatInput[0].focus();
-        } else if (mode == 'chat') {
-            // chrome.runtime.sendMessage({type: "PRINT", message: `successfully switched to chat mode`});
-            $('#chat_input').attr('placeholder', 'Write your message');
-            chatInput[0].focus();
-            $('#new_chat_button').click(function() {
-                chrome.runtime.sendMessage({type: "RESET_MESSAGES"});
-                // chrome.storage.sync.set({"messages": []});
-                chatContentDiv.empty();
-                chatInput[0].focus();
-            });
-            $('#chat_button').off('click').click(function() {
-                var message = $('#chat_input').val();
-                if (message == '') {
-                    return;
-                }
-                chatAppend(message, "human");
-                chrome.runtime.sendMessage({type: "CHAT_MESSAGE", message: message}, function(response) {
-                    // c_print(JSON.stringify(response));
-                    chatAppend(response.response, "assistant");
-                });
-                $('#chat_input').val('');
-            });
+                chatInput.css('border', '1px solid #42f59b');
+                break;
         }
+    }
+    
+    function handleApiKeyInput() {
+        const message = $('#chat_input').val();
+        if (message == '') {
+            return;
+        }
+        $('#chat_input').val('');
+        switch_mode('checking_api_key');
+        chrome.runtime.sendMessage({type: "API_KEY", key: message}, function(response) {
+            if (response.status == 'is_valid') {
+                chrome.storage.sync.set({'API_KEY': message});
+                switch_mode('chat');
+            } else if (response.status == 'not_valid'){
+                chrome.runtime.sendMessage({type: "PRINT", message: "api key invalid"});
+                switch_mode('api_key_invalid');
+            }
+        });
+    }
+    
+    function resetMessages() {
+        chrome.runtime.sendMessage({type: "RESET_MESSAGES"});
+        chatContentDiv.empty();
+        chatInput[0].focus();
+    }
+    
+    function handleChatMessage() {
+        const message = $('#chat_input').val();
+        if (message == '') {
+            return;
+        }
+        chatAppend(message, "human");
+        chrome.runtime.sendMessage({type: "CHAT_MESSAGE", message: message}, function(response) {
+            chatAppend(response.response, "assistant");
+        });
+        $('#chat_input').val('');
     }
 
     function createThinkingMessage(type) {
@@ -182,74 +202,3 @@ $(function() {
     }
 
 });
-
-
-
-    // function createInputForm() {
-    //     var apiInputDiv = document.getElementById('api_input_div');
-    //     var input = document.createElement('input');
-    //     var button = document.createElement('button');
-    
-    //     input.type = 'text';
-    //     input.name = 'API_KEY';
-    //     input.id = 'API_KEY';
-    //     input.placeholder = 'Enter your API Key here';
-    
-    //     button.innerHTML = 'Submit';
-    //     button.onclick = function() {
-    //         chrome.storage.sync.set({ 'API_KEY': input.value });
-    //         chrome.runtime.sendMessage({type: "API_KEY", key: input.value});
-    //         apiInputDiv.style.display = 'none';
-    //         buildUI();
-    //     };
-    
-    //     apiInputDiv.appendChild(input);
-    //     apiInputDiv.appendChild(button);
-    // }
-
-    // function buildUI() {
-    //     chrome.storage.sync.get('API_KEY', function(data) {
-    //         var api_key = data.API_KEY;
-    //         var span = document.createElement('span');
-    //         span.innerHTML = 'Your API Key is: ' + api_key;
-    //         document.body.appendChild(span);
-    
-    //         var chatDiv = document.getElementById('chat_div');
-    //         var chatContentDiv = document.createElement('div');
-    //         var chatInputDiv = document.createElement('div');
-    //         var chatInput = document.createElement('input');
-    //         var chatButton = document.createElement('button');
-    
-    //         chatContentDiv.id = 'chat_content_div';
-    //         chatInputDiv.id = 'chat_input_div';
-    //         chatInput.id = 'chat_input';
-    //         chatButton.id = 'chat_button';
-    //         chatButton.className = 'main_button';
-    
-    //         chatInput.type = 'text';
-    //         chatInput.placeholder = 'Type your message here';
-    //         chatButton.innerHTML = 'Send';
-    
-    //         chatButton.onclick = function() {
-    //             var message = chatInput.value;
-    //             if (message == '') {
-    //                 return;
-    //             }
-    //             chrome.runtime.sendMessage({type: "CHAT_MESSAGE", message: message});
-    //             chatInput.value = '';
-    //         };
-    
-    //         // Add keypress event listener to chatInput
-    //         chatInput.addEventListener('keydown', function(e) {
-    //             var key = e.keyCode
-    //             if (key === 13) { // 13 is the key code for Enter
-    //                 chatButton.click();
-    //             }
-    //         });
-    
-    //         chatInputDiv.appendChild(chatInput);
-    //         chatInputDiv.appendChild(chatButton);
-    //         chatDiv.appendChild(chatContentDiv);
-    //         chatDiv.appendChild(chatInputDiv);
-    //     });
-    // }
