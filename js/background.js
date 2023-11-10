@@ -11,7 +11,7 @@ chrome.runtime.onMessage.addListener(
     function(request, sender, sendResponse) {
         if (request.message === 'API_KEY') {
             apiKey = request.key; // Store the API key
-            console.log(apiKey);
+            // console.log(apiKey);
 
             chatGPT("hi")
                 .then(response => {
@@ -19,7 +19,7 @@ chrome.runtime.onMessage.addListener(
                         sendResponse({status: 'success'});
                     } else {
                         console.log("error");
-                        console.log(apiKey);
+                        // console.log(apiKey);
                         sendResponse({status: 'error'});
                     }
                 })
@@ -131,13 +131,14 @@ async function checkKeyValidity(api_key) {
 }
 
 async function gpt4v(query, imageUrl) {
-    chrome.runtime.sendMessage({message: "THINKING", type: "function_call"})
+    chrome.runtime.sendMessage({message: "THINKING", type: "function_call"});
+
     const headers = {
         "Content-Type": "application/json",
         "Authorization": `Bearer ${OPENAI_API_KEY}`
     };
 
-    let payload = {
+    const payload = {
         "model": "gpt-4-vision-preview",
         "messages": [
             {
@@ -150,7 +151,7 @@ async function gpt4v(query, imageUrl) {
                     {
                         "type": "image_url",
                         "image_url": {
-                            "url": `${imageUrl}`
+                            "url": imageUrl
                         }
                     }
                 ]
@@ -159,20 +160,25 @@ async function gpt4v(query, imageUrl) {
         "max_tokens": 1024
     };
 
-    let response = await fetch("https://api.openai.com/v1/chat/completions", { method: 'POST', headers: headers, body: JSON.stringify(payload) });
-    let data = await response.json();
-    console.log(data);
-    let textContent = data['choices'][0]['message']['content'];
+    const response = await fetch("https://api.openai.com/v1/chat/completions", { 
+        method: 'POST', 
+        headers: headers, 
+        body: JSON.stringify(payload) 
+    });
+
+    const data = await response.json();
+    const textContent = data.choices[0].message.content;
 
     return textContent;
 }
 
 async function chatGPT(input, model='gpt-4-1106-preview') {
-    
-    chrome.runtime.sendMessage({message: "THINKING", type: "normal_thinking"})
-
     const url = "https://api.openai.com/v1/chat/completions";
-    
+    const headers = {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${OPENAI_API_KEY}`
+    };
+
     const functions = [
         {
             "name": "grabScreenshotAndAsk",
@@ -189,11 +195,6 @@ async function chatGPT(input, model='gpt-4-1106-preview') {
             },
         },
     ];
-    
-    const headers = {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${OPENAI_API_KEY}`
-    };
 
     messages.push({"role": "user", "content": input});
     chrome.storage.sync.set({'messages': messages});
@@ -203,27 +204,13 @@ async function chatGPT(input, model='gpt-4-1106-preview') {
         "messages": messages,
         "functions": functions
     };
-    
+
     try {
-        const response = await fetch(url, {
-            method: "POST",
-            headers: headers,
-            body: JSON.stringify(data)
-        });
-        const responseData = await response.json();
-        return responseData
+        chrome.runtime.sendMessage({message: "THINKING", type: "normal_thinking"});
+        const response = await fetch(url, { method: "POST", headers, body: JSON.stringify(data) });
+        return await response.json();
     } catch (error) {
+        console.error(error);
         return false;
     }
-}
-
-async function getFromStorage(key) {
-    return new Promise((resolve, reject) => {
-        chrome.storage.sync.get(key, function(result) {
-            if (chrome.runtime.lastError) {
-                return reject(chrome.runtime.lastError);
-            }
-            resolve(result);
-        });
-    });
 }

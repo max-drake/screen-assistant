@@ -1,37 +1,20 @@
 $(function() {
-    // chrome.storage.sync.remove('API_KEY');
 
-    var chatDiv = $('#chat_div');
-    var chatContentDiv = $('<div>');
-    var chatInputDiv = $('<div>');
-    var chatInput = $('<input>');
-    var chatButton = $('<button>');
-    var newChatButton = $('<button>');
-
-    chatContentDiv.attr('id', 'chat_content_div');
-    chatInputDiv.attr('id', 'chat_input_div');
-    chatInput.attr('id', 'chat_input');
-    chatButton.attr('id', 'chat_button');
-    chatButton.addClass('main_button');
-    newChatButton.attr('id', 'new_chat_button');
-
-    chatInput.attr('type', 'text');
-    // chatInput.attr('placeholder', `${API_KEY_MODE}`);
-    chatButton.html('Send');
-    newChatButton.html('+');
-
-    chatInput.on('keydown', function(e) {
-        var key = e.which || e.keyCode;
-        if (key === 13) { // 13 is the key code for Enter
-            chatButton.click();
-        }
-    });
-
-    chatInputDiv.append(chatInput);
-    chatInputDiv.append(chatButton);
-    chatInputDiv.append(newChatButton);
-    chatDiv.append(chatContentDiv);
-    chatDiv.append(chatInputDiv);
+    $('#chat_div').append(
+        $('<div>').attr('id', 'chat_content_div'),
+        $('<div>').attr('id', 'chat_input_div').append(
+            $('<input>').attr({
+                id: 'chat_input',
+                type: 'text'
+            }).on('keydown', function(e) {
+                if ((e.which || e.keyCode) === 13) { // 13 is the key code for Enter
+                    $('#chat_button').click();
+                }
+            }),
+            $('<button>').attr('id', 'chat_button').addClass('main_button').html('Send'),
+            $('<button>').attr('id', 'new_chat_button').html('+')
+        )
+    );
 
     chrome.storage.sync.get('API_KEY', function(data) {
         var api_key = data.API_KEY || '';
@@ -145,8 +128,9 @@ $(function() {
     }
     
     function resetMessages() {
+        const chatInput = $('#chat_input');
         chrome.runtime.sendMessage({type: "RESET_MESSAGES"});
-        chatContentDiv.empty();
+        $('#chat_content_div').empty();
         chatInput[0].focus();
     }
     
@@ -171,12 +155,14 @@ $(function() {
     }
 
     function chatAppend(text, sender) {
+        var chatContentDiv = $('#chat_content_div');
+        
         text = text.replace(/\n/g, '<br>');
         var chat_div = $('<div>').html(text);
         
         // List of strings to check against
         var stringList = ["Thinking...", "Reading your screen..."]; // replace with your strings
-
+        
         // Check the last child of chatContentDiv
         var lastChild = chatContentDiv.children().last();
         if (lastChild.length > 0 && stringList.includes(lastChild.text())) {
@@ -199,6 +185,6 @@ $(function() {
     
     function c_print(text) {
         chrome.runtime.sendMessage({type: "PRINT", message: text});
-    }
+    }``
 
 });
