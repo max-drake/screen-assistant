@@ -1,0 +1,39 @@
+{
+    "manifest_version": 3,
+    "name": "Screen Assistant",
+    "description": "Bounce ideas off of an agent that can see all the same webpages you can",
+    "version": "1.0",
+    "permissions": ["activeTab", "tabs", "scripting", "storage", "contextMenus", "notifications", "clipboardWrite"],
+    "action": {
+      "default_popup": "html/popup.html",
+      "default_icon": {
+        "16": "icons/icon16.png",
+        "48": "icons/icon48.png",
+        "128": "icons/icon128.png"
+      }
+    },
+    "background": {
+      "service_worker": "js/background.js",
+      "type": "module"
+    },
+    "content_scripts": [
+      {
+        "matches": ["<all_urls>"],
+        "js": ["js/jquery.min.js", "js/content.js"]
+      }
+    ],
+    "host_permissions": ["*://*/*"],
+    "web_accessible_resources": [
+      {
+          "resources": ["fonts/*"],
+          "matches": ["<all_urls>"],
+          "use_dynamic_url": false
+      }
+    ],
+    "icons": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  }
+  

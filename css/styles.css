@@ -1,0 +1,118 @@
+@import url('https://fonts.googleapis.com/css?family=Poppins&display=swap');
+/* For Chrome, Safari */
+
+::-webkit-scrollbar {
+  display: none;
+}
+
+body {
+  width: 300px;
+  height: 480px;
+  scrollbar-width: none;
+  /* padding: 10px; */
+}
+
+h2 {
+  font-family: 'Poppins', sans-serif;
+  margin: 0px;
+}
+
+.main_button {
+  background: #637EF7;
+  border: 0px;
+  border-radius: 6px;
+  font-family: 'Poppins', sans-serif;
+  color: white;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  position: relative;
+  font-size: 14px;
+}
+
+#chat_div {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  gap: 8px;
+}
+
+#chat_content_div {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+
+#chat_input_div {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+#chat_input {
+  flex-grow: 1;
+  border: 1px solid #637EF7;
+  border-radius: 6px;
+  padding: 4px;
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+}
+
+#chat_button {
+  width: 60px;
+}
+
+#new_chat_button {
+  width: 31px;
+  height: 31px;
+  background: white;
+  border: 1px solid #637EF7;
+  border-radius: 6px;
+  font-family: 'Poppins', sans-serif;
+  color: #637EF7;
+  font-size: 18px;
+  transition: background-color 0.3s ease, color 0.3s ease; /* Optional: for smooth transition */
+}
+
+#new_chat_button:hover {
+  background: #637EF7;
+  color: white;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.chat_box {
+  display: inline-block;
+  padding: 4px 8px;
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  border-radius: 6px;
+  max-width: 80%;
+}
+
+.chat_box.human {
+  background: #637EF7;
+  color: white;
+  /* text-align: right; */
+  align-self: flex-end;
+}
+
+.chat_box.assistant {
+  background: #F5F5F5;
+  color: black;
+  align-self: flex-start;
+  animation: fadeIn 0.5s ease-in;
+}
+ 
+.chat_box.function_call {
+  background: #FFA500;
+  color: white;
+  align-self: flex-start;
+  animation: fadeIn 0.5s ease-in;
+}
